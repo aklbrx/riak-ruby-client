@@ -27,6 +27,14 @@ module Riak
         @read_timeout ||= 4096
       end
 
+      def self.open_timeout=(timeout)
+        @open_timeout = timeout
+      end
+
+      def self.open_timeout
+        @open_timeout ||= 4096
+      end
+
       # Net::HTTP doesn't use persistent connections, so there's no
       # work to do here.
       def teardown; end
@@ -35,6 +43,7 @@ module Riak
       def perform(method, uri, headers, expect, data=nil) #:nodoc:
         http = Net::HTTP.new(uri.host, uri.port)
         http.read_timeout = self.class.read_timeout
+        http.open_timeout = self.class.open_timeout
         configure_ssl(http) if @node.ssl_enabled?
 
         request = Net::HTTP.const_get(method.to_s.capitalize).new(uri.request_uri, headers)
